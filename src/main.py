@@ -8,4 +8,3 @@ async def init():
     return {'Mensagem':'Você esta na rota inicial, acesse o /docs para mais informações'}
 
 app.include_router(auth_router)
-

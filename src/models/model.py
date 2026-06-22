@@ -31,6 +31,13 @@ class Usuario(Base):
     acerto_total = Column('acerto_total', Integer)
     erro_total = Column('erro_total', Integer)
 
+    def __init__(self, nome, senha, nivel = 0, acerto_total = 0, erro_total = 0):
+         self.nome = nome
+         self.senha = senha
+         self.nivel = nivel
+         self.acerto_total = acerto_total
+         self.erro_total = erro_total         
+
     def criptografar(self,senha):
            self.senha = sha256.encrypt(senha)
 
@@ -42,7 +49,7 @@ class Perguta(Base):
      __tablename__ = 'Pergunta'
 
      id = Column('id', Integer, autoincrement=True, primary_key=True, unique=True)
-     categoria_id = Column('categoria', String(255), ForeignKey('Categoria.id'))
+     categoria_id = Column('categoria', Integer, ForeignKey('Categoria.id'))
      pergunta = Column('pergunta', String(2000), nullable=False )
      alternativas = Column('alternativas', JSON)                                    #NOTE - vai ser um dicionario de listas = {[{}]}
      resposta = Column('resposta', String(1))

@@ -1,24 +1,62 @@
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Depends
 from typing import Annotated
-from models.auth import engine
-from sqlalchemy.orm import sessionmaker
-from passlib.hash import sha256_crypt as sha256
-from models.auth import Usuario
+from models.model import Usuario
+from dependencies import Session as ses
+
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
+@router.get('/login')
+async def login(nome:str, senha:str, session = Depends(ses)):
+    usuario = session.query(Usuario).filter(Usuario.nome == nome).first()
+    if usuario:
+        if usuario.verify(senha) == True:
+            return {'mensagem':'usuario autenticado'}
+        else:
+            return {'Mensagem':'Usuario ou Senha incorretos'}
+    else:
+        return {'mensagem': 'Usuario não encontrado'}
+
+@router.post('/criar_conta')
+async def criar_conta(nome:str, senha:str, session = Depends(ses)):
+    usuario = session.query(Usuario).filter(Usuario.nome == nome).first()
+    if usuario:
+        return {'mensagem':'Usuario já criado'}        
+    else:
+        novo_user = Usuario(nome=nome, senha=senha)
+        novo_user.criptografar(senha)
+        session.add(novo_user)
+        session.commit()
+        return {'mensagem':'Usuario criado com sucesso!'}
+    
+
 @router.get("/listar_dados")
-async def dados(user : Annotated[str | None, Header()] = None):
-    return {'user':user}
+async def dados(nome : Annotated[str | None, Header()] = None, session = Depends(ses)) :
+    user = session.query(Usuario).filter(Usuario.nome == nome).first()
+    if user:
+        usuario = session.query(Usuario).filter(Usuario.nome == nome).first()
+        user_dados = {
+                      "id":usuario.id,
+                      'nome':usuario.nome,
+                      'nivel':usuario.nivel,
+                      'acerto_total':usuario.acerto_total,
+                      'erro_total':usuario.erro_total
+                      }
+        return user_dados
+    else:
+        return {'mensagem': 'Usuario não encontrado'}
 
+@router.get('/nivel')
+async def listar_nivel(nome:str, session = Depends(ses)):
+    usuario = session.query(Usuario).filter(Usuario.nome == nome).first()
+    if not usuario:
+        return {'mensagem': 'Usuário não encontrado'}
+    nivel = usuario.nivel    
+    return nivel
 
-@router.get('/listar_nivel')
-async def listar_nivel(nome: str, senha:str):
-    session = sessionmaker(bind=engine)
-    Session = session()
-    if Session.query(Usuario).filter(Usuario.nome == nome).first():
-        senhas = Usuario.verify(senha)
-        if senhas:
-            Session.query(Usuario).filter(Usuario.senha == nome).first()
-        
-    return None
+@router.delete('/deletar_usuario')
+async def deletar_user(nome:str, session = Depends(ses)):
+    usuario = session.query(Usuario).filter(Usuario.nome == nome).first()
+    session.delete(usuario)
+    session.commit()
+    return {'mensagem':'Usuario excluido com sucesso'}
