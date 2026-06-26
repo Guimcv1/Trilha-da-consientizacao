@@ -1,14 +1,13 @@
 from src.main import engine
 from sqlalchemy.orm import sessionmaker
 
-# dependencia para criar a session
+# Depêndencia que gera uma sessão SQLAlchemy para cada requisição.
+# O FastAPI fecha a sessão automaticamente ao final do request.
+
 def get_session():
+    SessionLocal = sessionmaker(bind=engine)
+    session = SessionLocal()
     try:
-        SessionM = sessionmaker(bind=engine)
-        session = SessionM()
         yield session
     finally:
         session.close()
-
-
-

@@ -2,13 +2,10 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from src.models.model import Usuario
 
+# Serviço de autenticação e criação de contas.
 
 def login(db, credenciais):
-    """Autentica um usuário usando as credenciais fornecidas.
-
-    Recebe o schema UsuarioLogin, busca o usuário no banco e compara a senha.
-    Retorna uma mensagem de sucesso ou levanta uma HTTPException em caso de erro.
-    """
+    """Autentica um usuário usando nome e senha."""
     usuario = db.query(Usuario).filter(Usuario.nome == credenciais.nome).first()
     
     if not usuario:
@@ -21,16 +18,12 @@ def login(db, credenciais):
 
 
 def criar_conta(db, dados):
-    """Cria uma nova conta de usuário.
-
-    Recebe o schema UsuarioCreate, verifica se o nome já existe e cria o registro.
-    Retorna uma mensagem de confirmação após salvar no banco.
-    """
+    """Cria um novo usuário e salva no banco."""
     usuario = db.query(Usuario).filter(Usuario.nome == dados.nome).first()
     
     if usuario:
-        raise HTTPException(status_code=400, detail="Usuário já cadastrado")        
-    
+        raise HTTPException(status_code=400, detail="Usuário já cadastrado")
+        
     novo_user = Usuario(nome=dados.nome, senha=dados.senha)
     novo_user.criptografar(dados.senha)
     
@@ -42,10 +35,7 @@ def criar_conta(db, dados):
 
 
 def dados(db, nome):
-    """Retorna os dados do usuário solicitado pelo nome.
-
-    Busca o usuário no banco e retorna o objeto para o router serializar.
-    """
+    """Retorna os dados do usuário solicitado pelo nome."""
     usuario = db.query(Usuario).filter(Usuario.nome == nome).first()
     
     if not usuario:
@@ -55,10 +45,7 @@ def dados(db, nome):
 
 
 def listar_nivel(db, nome):
-    """Retorna o nível do usuário.
-
-    Busca o usuário pelo nome e retorna uma mensagem com o nível atual.
-    """
+    """Retorna o nível do usuário identificado pelo nome."""
     usuario = db.query(Usuario).filter(Usuario.nome == nome).first()
     
     if not usuario:
@@ -68,10 +55,7 @@ def listar_nivel(db, nome):
 
 
 def deletar_user(db, nome):
-    """Deleta o usuário identificado pelo nome.
-
-    Remove o registro do banco e retorna uma mensagem de confirmação.
-    """
+    """Deleta o usuário identificado pelo nome."""
     usuario = db.query(Usuario).filter(Usuario.nome == nome).first()
     
     if not usuario:

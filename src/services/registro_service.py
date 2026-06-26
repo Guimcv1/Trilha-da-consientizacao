@@ -1,12 +1,14 @@
 from src.models.model import Registro
 from fastapi import HTTPException
 
+# Serviço de CRUD para registros de desempenho.
+
 def criar_registro(db, dados):
-    """CREATE: Cria um registro de acerto/erro associado a user e categoria."""
+    """Cria um registro de acerto/erro associado a usuário e categoria."""
     novo_registro = Registro(
         categoria_id=dados.categoria_id,
         user_id=dados.user_id,
-        acerto_categoria=dados.acerto_categoria
+        acerto_categoria=dados.acerto_categoria,
     )
     
     try:
@@ -25,29 +27,26 @@ def criar_registro(db, dados):
     except Exception:
         db.rollback()
         raise HTTPException(
-            status_code=400, 
-            detail="Erro de integridade: Verifique se o user_id e a categoria_id existem."
+            status_code=400,
+            detail="Erro de integridade: Verifique se o user_id e a categoria_id existem.",
         )
+
 
 def listar_registros(db):
-    """READ: Lista todos os registros cadastrados."""
+    """Retorna todos os registros cadastrados."""
     return db.query(Registro).all()
 
+
 def buscar_registro_por_id(db, registro_id):
-    """READ: Busca um registro pelo ID. Lança 404 se não for encontrado."""
+    """Busca um registro pelo ID e levanta 404 se não existir."""
     registro = db.query(Registro).filter(Registro.id == registro_id).first()
     if not registro:
-        raise HTTPException(
-            status_code=404, 
-            detail=f"Registro com ID {registro_id} não encontrado."
-        )
+        raise HTTPException(status_code=404, detail=f"Registro com ID {registro_id} não encontrado.")
     return registro
 
-def atualizar_registro(db, registro_id, dados):
-    """UPDATE: Atualiza um registro existente.
 
-    Recebe o schema `RegistroCreate` e retorna uma mensagem de confirmação.
-    """
+def atualizar_registro(db, registro_id, dados):
+    """Atualiza um registro existente com novos valores."""
     registro = buscar_registro_por_id(db, registro_id)
     
     registro.categoria_id = dados.categoria_id
@@ -68,13 +67,11 @@ def atualizar_registro(db, registro_id, dados):
         }
     except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=400, 
-            detail="Erro de integridade ao atualizar: Verifique os IDs informados."
-        )
+        raise HTTPException(status_code=400, detail="Erro de integridade ao atualizar: Verifique os IDs informados.")
+
 
 def deletar_registro(db, registro_id):
-    """DELETE: Remove um registro existente."""
+    """Remove um registro existente do banco."""
     registro = buscar_registro_por_id(db, registro_id)
     
     try:

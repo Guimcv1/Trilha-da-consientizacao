@@ -1,13 +1,10 @@
 from fastapi import HTTPException
 from src.models.model import Categoria
 
+# Serviço de CRUD para categorias.
 
 def criar_categoria(categoria_input, db):
-    """CREATE: Cria uma nova categoria.
-
-    Recebe o schema `CategoriaCreate`, valida a existência e salva no banco.
-    Retorna o objeto da categoria criada.
-    """
+    """Cria uma nova categoria e salva no banco."""
     nova_categoria = Categoria(nome=categoria_input.nome)
     try:
         db.add(nova_categoria)
@@ -20,12 +17,12 @@ def criar_categoria(categoria_input, db):
 
 
 def listar_categorias(db):
-    """READ: Lista todas as categorias cadastradas."""
+    """Lista todas as categorias cadastradas."""
     return db.query(Categoria).all()
 
 
 def buscar_categoria(categoria_id, db):
-    """READ: Busca uma categoria pelo ID. Lança 404 se não existir."""
+    """Busca uma categoria pelo ID e levanta 404 se não existir."""
     categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
     if not categoria:
         raise HTTPException(status_code=404, detail=f"Categoria com ID {categoria_id} não foi encontrada.")
@@ -33,10 +30,7 @@ def buscar_categoria(categoria_id, db):
 
 
 def atualizar_categoria(categoria_id, categoria_input, db):
-    """UPDATE: Atualiza o nome de uma categoria existente.
-
-    Recebe o schema `CategoriaCreate` para os dados de entrada e retorna a categoria atualizada.
-    """
+    """Atualiza o nome de uma categoria existente."""
     categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
     if not categoria:
         raise HTTPException(status_code=404, detail=f"Não foi possível atualizar: Categoria com ID {categoria_id} não existe.")
@@ -52,7 +46,7 @@ def atualizar_categoria(categoria_id, categoria_input, db):
 
 
 def deletar_categoria(categoria_id, db):
-    """DELETE: Remove uma categoria pelo ID."""
+    """Remove uma categoria e trata dependências de registros."""
     categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
     if not categoria:
         raise HTTPException(status_code=404, detail=f"Não foi possível deletar: Categoria com ID {categoria_id} não existe.")

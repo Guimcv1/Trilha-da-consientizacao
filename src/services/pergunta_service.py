@@ -1,12 +1,10 @@
 from fastapi import HTTPException
 from src.models.model import Pergunta, Categoria
 
-def criar_pergunta(pergunta_input, db):
-    """CREATE: Cria uma nova pergunta.
+# Serviço de CRUD para perguntas.
 
-    Recebe o schema `PerguntaCreate`, valida a categoria informada e salva no banco.
-    Retorna somente uma mensagem de sucesso.
-    """
+def criar_pergunta(pergunta_input, db):
+    """Cria uma nova pergunta e valida a categoria informada."""
     categoria_id = pergunta_input.categoria
     if categoria_id in (None, 0, ""):
         categoria_id = None
@@ -20,7 +18,7 @@ def criar_pergunta(pergunta_input, db):
         alternativas=pergunta_input.alternativas,
         resposta=pergunta_input.resposta,
         feedback=pergunta_input.feedback,
-        categoria_id=categoria_id
+        categoria_id=categoria_id,
     )
     
     try:
@@ -34,12 +32,12 @@ def criar_pergunta(pergunta_input, db):
 
 
 def listar_perguntas(db):
-    """READ: Lista todas as perguntas cadastradas."""
+    """Lista todas as perguntas cadastradas."""
     return db.query(Pergunta).all()
 
 
 def buscar_pergunta(pergunta_id, db):
-    """READ: Busca uma pergunta pelo ID. Lança 404 se não for encontrada."""
+    """Busca uma pergunta pelo ID e levanta 404 se não existir."""
     pergunta = db.query(Pergunta).filter(Pergunta.id == pergunta_id).first()
     if not pergunta:
         raise HTTPException(status_code=404, detail=f"Pergunta com ID {pergunta_id} não foi encontrada.")
@@ -47,10 +45,7 @@ def buscar_pergunta(pergunta_id, db):
 
 
 def atualizar_pergunta(pergunta_id, pergunta_input, db):
-    """UPDATE: Atualiza os dados de uma pergunta completa.
-
-    O schema `PerguntaCreate` define os campos que podem ser atualizados.
-    """
+    """Atualiza os dados de uma pergunta existente."""
     pergunta_banco = db.query(Pergunta).filter(Pergunta.id == pergunta_id).first()
     if not pergunta_banco:
         raise HTTPException(status_code=404, detail=f"Não foi possível atualizar: Pergunta com ID {pergunta_id} não existe.")
@@ -79,7 +74,7 @@ def atualizar_pergunta(pergunta_id, pergunta_input, db):
 
 
 def deletar_pergunta(pergunta_id, db):
-    """DELETE: Remove uma pergunta pelo ID."""
+    """Remove uma pergunta existente."""
     pergunta = db.query(Pergunta).filter(Pergunta.id == pergunta_id).first()
     if not pergunta:
         raise HTTPException(status_code=404, detail=f"Não foi possível deletar: Pergunta com ID {pergunta_id} não existe.")

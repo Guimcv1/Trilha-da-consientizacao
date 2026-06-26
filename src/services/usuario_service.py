@@ -2,13 +2,10 @@ from sqlalchemy.orm import Session
 from src.models.model import Usuario
 from fastapi import HTTPException
 
+# Serviço de CRUD de usuários e suas estatísticas.
 
-# CREATE: Cria um novo usuário a partir dos dados enviados pelo router.
-#  - Validações de unicidade são tratadas pela tentativa de commit no banco.
-#  - Em caso de sucesso retorna um dicionário com `mensagem`.
 def criar_usuario(usuario_input, db):
-    """Cria um novo usuário e retorna mensagem de confirmação."""
-
+    """Cria um novo usuário e retorna a entidade criada."""
     novo_usuario = Usuario(
         nome=usuario_input.nome,
         senha=usuario_input.senha,
@@ -23,23 +20,22 @@ def criar_usuario(usuario_input, db):
         db.rollback()
         raise HTTPException(status_code=400, detail=f"O nome de usuário '{usuario_input.nome}' já está em uso.")
 
+
 def listar_usuarios(db):
-    """READ: Lista todos os usuários."""
+    """Retorna todos os usuários do banco."""
     return db.query(Usuario).all()
 
+
 def buscar_usuario(usuario_id, db):
-    """READ: Busca um usuário pelo ID. Lança 404 se não encontrar."""
+    """Busca um usuário pelo ID. Levanta 404 se não existir."""
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail=f"Usuário com ID {usuario_id} não foi encontrado.")
     return usuario
 
-def atualizar_progresso(usuario_id, dados, db):
-    """UPDATE: Atualiza `acerto_total` e `erro_total` do usuário.
 
-    - Recebe o schema `UsuarioUpdateProgresso` com os campos atualizáveis.
-    - Retorna mensagem de confirmação ao finalizar.
-    """
+def atualizar_progresso(usuario_id, dados, db):
+    """Atualiza o progresso de acertos e erros de um usuário."""
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
     if not usuario:
@@ -56,11 +52,9 @@ def atualizar_progresso(usuario_id, dados, db):
         db.rollback()
         raise HTTPException(status_code=400, detail="Não foi possível atualizar o progresso do usuário.") from exc
 
-def deletar_usuario(usuario_id, db):
-    """DELETE: Remove um usuário.
 
-    - Em caso de sucesso retorna um dicionário com `mensagem`.
-    """
+def deletar_usuario(usuario_id, db):
+    """Deleta um usuário e trata falhas de integridade."""
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
     if not usuario:
