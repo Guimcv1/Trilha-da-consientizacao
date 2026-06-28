@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from src.schemas.registro_schema import RegistroCreate, RegistroResponse, RegistroMensagemResponse
+from schemas.registro_schema import RegistroCreate, RegistroResponse, RegistroMensagemResponse
 from sqlalchemy.orm import Session
-from src.services.registro_service import criar_registro, listar_registros, buscar_registro_por_id, atualizar_registro, deletar_registro
-from src.dependencies import get_session
+from services.registro_service import criar_registro, listar_registros, buscar_registro_por_id, atualizar_registro, deletar_registro
+from dependencies import get_session
 
 # Router para operações sobre registros de desempenho.
 registro_router = APIRouter(prefix="/registro", tags=["registro"])

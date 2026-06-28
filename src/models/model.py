@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, JSON
 from passlib.hash import sha256_crypt as sha256
-from src.main import Base
+from main import Base
 
 # Modelo de usuário com dados de autenticação e estatísticas.
 class Usuario(Base):

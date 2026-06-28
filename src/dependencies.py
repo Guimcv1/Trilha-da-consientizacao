@@ -1,4 +1,4 @@
-from src.main import engine
+from main import engine
 from sqlalchemy.orm import sessionmaker
 
 # Depêndencia que gera uma sessão SQLAlchemy para cada requisição.

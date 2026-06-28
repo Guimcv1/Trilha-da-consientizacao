@@ -47,11 +47,11 @@ engine = create_engine(URL, echo=True)
 Base = declarative_base()
 
 # Importa os routers após a configuração da Base para evitar problemas de importação circular.
-from .routers.auth_router import auth_router
-from .routers.usuario_router import usuario_router
-from .routers.categoria_router import categoria_router
-from .routers.pergunta_router import pergunta_router
-from .routers.registro_router import registro_router
+from routers.auth_router import auth_router
+from routers.usuario_router import usuario_router
+from routers.categoria_router import categoria_router
+from routers.pergunta_router import pergunta_router
+from routers.registro_router import registro_router
 
 # Registra os routers no aplicativo principal.
 app.include_router(auth_router)

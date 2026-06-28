@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 from typing import Annotated
-from src.schemas.usuario_schema import UsuarioCreate, UsuarioLogin, UsuarioResponse, MensagemResponse
-from src.services.auth_service import login, criar_conta, dados, listar_nivel, deletar_user
-from src.dependencies import get_session
+from schemas.usuario_schema import UsuarioCreate, UsuarioLogin, UsuarioResponse, MensagemResponse
+from services.auth_service import login, criar_conta, dados, listar_nivel, deletar_user
+from dependencies import get_session
 
 # Router para autenticação e operação de usuário via Header.
 auth_router = APIRouter(prefix="/auth", tags=["Autenticação e Usuários"])

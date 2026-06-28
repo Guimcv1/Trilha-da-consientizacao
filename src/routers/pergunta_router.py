@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from src.services.pergunta_service import criar_pergunta, listar_perguntas, buscar_pergunta, atualizar_pergunta, deletar_pergunta
-from src.schemas.pergunta_schema import PerguntaCreate, PerguntaResponse, PerguntaMensagemResponse
-from src.dependencies import get_session
+from services.pergunta_service import criar_pergunta, listar_perguntas, buscar_pergunta, atualizar_pergunta, deletar_pergunta
+from schemas.pergunta_schema import PerguntaCreate, PerguntaResponse, PerguntaMensagemResponse
+from dependencies import get_session
 
 # Router que agrupa os endpoints de pergunta.
 pergunta_router = APIRouter(prefix="/pergunta", tags=["pergunta"])

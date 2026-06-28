@@ -1,12 +1,12 @@
 from fastapi import HTTPException
-from src.models.model import Categoria
+from models.model import Categoria
 
 # Serviço de CRUD para categorias.
 
 def criar_categoria(categoria_input, db):
     """Cria uma nova categoria e salva no banco."""
-    nova_categoria = Categoria(nome=categoria_input.nome)
     try:
+        nova_categoria = Categoria(nome=categoria_input.nome)
         db.add(nova_categoria)
         db.commit()
         db.refresh(nova_categoria)
@@ -18,22 +18,30 @@ def criar_categoria(categoria_input, db):
 
 def listar_categorias(db):
     """Lista todas as categorias cadastradas."""
-    return db.query(Categoria).all()
+    try:
+        return db.query(Categoria).all()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao listar categorias.")
 
 
 def buscar_categoria(categoria_id, db):
     """Busca uma categoria pelo ID e levanta 404 se não existir."""
-    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
-    if not categoria:
-        raise HTTPException(status_code=404, detail=f"Categoria com ID {categoria_id} não foi encontrada.")
-    return categoria
-
+    try:
+        categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail=f"Categoria com ID {categoria_id} não foi encontrada.")
+        return categoria
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar categoria.")
 
 def atualizar_categoria(categoria_id, categoria_input, db):
     """Atualiza o nome de uma categoria existente."""
-    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
-    if not categoria:
-        raise HTTPException(status_code=404, detail=f"Não foi possível atualizar: Categoria com ID {categoria_id} não existe.")
+    try:
+        categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail=f"Não foi possível atualizar: Categoria com ID {categoria_id} não existe.")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar categoria para atualização.")
 
     try:
         categoria.nome = categoria_input.nome
@@ -47,17 +55,17 @@ def atualizar_categoria(categoria_id, categoria_input, db):
 
 def deletar_categoria(categoria_id, db):
     """Remove uma categoria e trata dependências de registros."""
-    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
-    if not categoria:
-        raise HTTPException(status_code=404, detail=f"Não foi possível deletar: Categoria com ID {categoria_id} não existe.")
+    try:
+        categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first()
+        if not categoria:
+            raise HTTPException(status_code=404, detail=f"Não foi possível deletar: Categoria com ID {categoria_id} não existe.")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar categoria para exclusão.")
 
     try:
         db.delete(categoria)
         db.commit()
         return {"mensagem": "Categoria deletada com sucesso."}
-    except Exception as exc:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=400,
-            detail="Não foi possível deletar a categoria porque ela está vinculada a registros.",
-        ) from exc
+        raise HTTPException(status_code=400, detail="Não foi possível deletar a categoria porque ela está vinculada a registros.") 

@@ -1,17 +1,16 @@
-from src.models.model import Registro
+from models.model import Registro
 from fastapi import HTTPException
 
 # Serviço de CRUD para registros de desempenho.
 
 def criar_registro(db, dados):
     """Cria um registro de acerto/erro associado a usuário e categoria."""
-    novo_registro = Registro(
-        categoria_id=dados.categoria_id,
-        user_id=dados.user_id,
-        acerto_categoria=dados.acerto_categoria,
-    )
-    
     try:
+        novo_registro = Registro(
+            categoria_id=dados.categoria_id,
+            user_id=dados.user_id,
+            acerto_categoria=dados.acerto_categoria,
+        )
         db.add(novo_registro)
         db.commit()
         db.refresh(novo_registro)
@@ -34,26 +33,34 @@ def criar_registro(db, dados):
 
 def listar_registros(db):
     """Retorna todos os registros cadastrados."""
-    return db.query(Registro).all()
+    try:
+        return db.query(Registro).all()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao listar registros.")
 
 
 def buscar_registro_por_id(db, registro_id):
     """Busca um registro pelo ID e levanta 404 se não existir."""
-    registro = db.query(Registro).filter(Registro.id == registro_id).first()
-    if not registro:
-        raise HTTPException(status_code=404, detail=f"Registro com ID {registro_id} não encontrado.")
-    return registro
+    try:
+        registro = db.query(Registro).filter(Registro.id == registro_id).first()
+        if not registro:
+            raise HTTPException(status_code=404, detail=f"Registro com ID {registro_id} não encontrado.")
+        return registro
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar registro.")
 
 
 def atualizar_registro(db, registro_id, dados):
     """Atualiza um registro existente com novos valores."""
-    registro = buscar_registro_por_id(db, registro_id)
-    
-    registro.categoria_id = dados.categoria_id
-    registro.user_id = dados.user_id
-    registro.acerto_categoria = dados.acerto_categoria
+    try:
+        registro = buscar_registro_por_id(db, registro_id)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar registro para atualização.")
     
     try:
+        registro.categoria_id = dados.categoria_id
+        registro.user_id = dados.user_id
+        registro.acerto_categoria = dados.acerto_categoria
         db.commit()
         db.refresh(registro)
         return {
@@ -72,8 +79,11 @@ def atualizar_registro(db, registro_id, dados):
 
 def deletar_registro(db, registro_id):
     """Remove um registro existente do banco."""
-    registro = buscar_registro_por_id(db, registro_id)
-    
+    try:
+        registro = buscar_registro_por_id(db, registro_id)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Erro ao buscar registro para exclusão.")
+
     try:
         db.delete(registro)
         db.commit()

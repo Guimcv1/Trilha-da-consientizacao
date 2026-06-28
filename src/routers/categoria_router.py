@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.services.categoria_service import criar_categoria, listar_categorias, buscar_categoria, atualizar_categoria, deletar_categoria
-from src.schemas.categoria_schema import CategoriaCreate, CategoriaResponse, CategoriaMensagemResponse
-from src.dependencies import get_session
+from services.categoria_service import criar_categoria, listar_categorias, buscar_categoria, atualizar_categoria, deletar_categoria
+from schemas.categoria_schema import CategoriaCreate, CategoriaResponse, CategoriaMensagemResponse
+from dependencies import get_session
 
 # Router que agrupa os endpoints de categoria.
 categoria_router = APIRouter(prefix="/categoria", tags=["Categoria"])

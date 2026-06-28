@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from src.services.usuario_service import listar_usuarios, criar_usuario, buscar_usuario, atualizar_progresso, deletar_usuario
-from src.dependencies import get_session
+from services.usuario_service import listar_usuarios, criar_usuario, buscar_usuario, atualizar_progresso, deletar_usuario
+from dependencies import get_session
 from sqlalchemy.orm import Session
-from src.schemas.usuario_schema import UsuarioCreate, UsuarioUpdateProgresso, UsuarioMensagemResponse
+from schemas.usuario_schema import UsuarioCreate, UsuarioUpdateProgresso, UsuarioMensagemResponse
 
 # Router para operações de usuário.
 usuario_router = APIRouter(prefix='/usuario', tags=['Usuario'])
